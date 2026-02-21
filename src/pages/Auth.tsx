@@ -16,7 +16,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; fullName?: string }>({});
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, signInWithOAuth } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -43,6 +43,14 @@ const Auth = () => {
 
   const validateRegister = () => {
     const result = registerSchema.safeParse({ email, password, fullName: fullName || undefined });
+    
+    const mindlugosc = 8;
+    const isstrong = password.length >= mindlugosc && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
+    if (!isstrong) {
+      setErrors({ password: `Hasło musi mieć co najmniej ${mindlugosc} znaków, zawierać wielką literę, małą literę, cyfrę i znak specjalny.` });
+      return false;
+    }
+    
     if (!result.success) {
       const fieldErrors: typeof errors = {};
       result.error.errors.forEach((err) => {
@@ -188,6 +196,28 @@ const Auth = () => {
 
                 <Button type="submit" variant="gold" className="w-full" disabled={isLoading}>
                   {isLoading ? 'Logowanie...' : 'Zaloguj się'}
+                </Button>
+                <div className="text-center my-2 text-sm text-muted-foreground">— lub —</div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center"
+                  onClick={async () => {
+                    setIsLoading(true);
+                    const { error } = await signInWithOAuth('google');
+                    if (error) {
+                      toast({ title: 'Błąd logowania', description: error.message, variant: 'destructive' });
+                    }
+                    setIsLoading(false);
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5 mr-2" aria-hidden>
+                    <path fill="#fbbc05" d="M43.6 20.5H42V20H24v8h11.3C34.3 33 30 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.6C35.6 6.9 30.1 4 24 4 12.95 4 4 12.95 4 24s8.95 20 20 20c11.05 0 20-8.95 20-20 0-1.3-.12-2.57-.4-3.75z"/>
+                    <path fill="#4285F4" d="M6.3 14.9l6.6 4.8C14.7 16 19 13.5 24 13.5c3.1 0 5.9 1.2 8 3.1l5.7-5.6C35.6 6.9 30.1 4 24 4 16.9 4 10.6 7.7 6.3 14.9z"/>
+                    <path fill="#34A853" d="M24 44c6.6 0 12-5.4 12-12 0-1.5-.3-2.9-.8-4.2L24 29.5v14.5z"/>
+                    <path fill="#ea4335" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.6-2.7 4.8-5 6.2l6 4.4C40.6 34.9 43.6 28.3 43.6 20.5z"/>
+                  </svg>
+                  Zaloguj przez Google
                 </Button>
               </form>
             </TabsContent>

@@ -151,8 +151,10 @@ const CourseDetails = () => {
       );
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Błąd funkcji');
+        const errorJson = await response.json();
+        console.error('create-checkout error response:', errorJson);
+        const serverMessage = errorJson?.error || errorJson?.message || JSON.stringify(errorJson);
+        throw new Error(serverMessage || 'Błąd funkcji');
       }
 
       const data = await response.json();
@@ -164,7 +166,9 @@ const CourseDetails = () => {
       console.error('Purchase error:', error);
       toast({
         title: "Błąd płatności",
-        description: "Nie udało się utworzyć sesji płatności. Spróbuj ponownie.",
+        description: error?.message
+          ? `Nie udało się utworzyć sesji płatności: ${error.message}`
+          : "Nie udało się utworzyć sesji płatności. Spróbuj ponownie.",
         variant: "destructive",
       });
     } finally {

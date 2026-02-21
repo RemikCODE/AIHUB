@@ -27,8 +27,8 @@ const Index = () => {
   ];
 
   const stats = [
-    { value: '10k+', label: 'Kursantów' },
-    { value: '50+', label: 'Modułów' },
+    { value: '356', label: 'Kursantów' },
+    { value: '15', label: 'Modułów' },
     { value: '95%', label: 'Zadowolonych' },
     { value: '24/7', label: 'Dostęp' }
   ];
@@ -191,7 +191,7 @@ const Index = () => {
               <span className="font-serif font-bold text-xl">AI Academy</span>
             </div>
             <p className="text-muted-foreground text-sm">
-              © 2024 AI Academy. Wszystkie prawa zastrzeżone.
+              © 2025 AI HUB. Wszystkie prawa zastrzeżone.
             </p>
           </div>
         </div>

@@ -28,12 +28,20 @@ serve(async (req) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://orcnkyuwwkfdgvktunkd.supabase.co";
-  const supabaseAnonKey = Deno.env.get("ANON_KEY") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yY25reXV3d2tmZGd2a3R1bmtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NDkzNTMsImV4cCI6MjA4NTAyNTM1M30.iCRjHhnxC4u3RbbKDYcoVxxU3sO6FRhkPWBT6XtqbKA";
-  
-  const supabaseClient = createClient(
-    supabaseUrl,
-    supabaseAnonKey
-  );
+  // Prefer a service role key for server-side operations. Fall back to ANON if not available.
+  // IMPORTANT: do not hardcode keys in source. Ensure SUPABASE_SERVICE_ROLE_KEY or ANON_KEY
+  // are set in the environment where this function runs (Supabase Dashboard secrets).
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("ANON_KEY") || "";
+
+  if (!supabaseKey) {
+    console.error("Missing Supabase key in environment (SUPABASE_SERVICE_ROLE_KEY or ANON_KEY)");
+    return new Response(JSON.stringify({ error: "Configuration error: missing Supabase key" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
   try {
     const authHeader = req.headers.get("Authorization");
@@ -121,7 +129,7 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await stripe.checkout.sessions.nocreate({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],

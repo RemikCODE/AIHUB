@@ -3,7 +3,7 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-  apiVersion: "2025-06-30.basil",
+  apiVersion: "2026-01-28.clover",
 });
 
 const supabaseAdmin = createClient(
@@ -40,7 +40,7 @@ serve(async (req) => {
         return new Response("Missing metadata", { status: 400 });
       }
 
-      // Check if access already exists
+      
       const { data: existingAccess } = await supabaseAdmin
         .from("user_course_access")
         .select("id")
@@ -56,7 +56,7 @@ serve(async (req) => {
         });
       }
 
-      // Grant access to the course
+    
       const { error } = await supabaseAdmin
         .from("user_course_access")
         .insert({
