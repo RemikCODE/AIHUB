@@ -2,8 +2,18 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+// Prefer env-provided values injected by Vite. As a fallback (safe, non-secret)
+// we use the project's Supabase URL so the app can still run in dev without
+// a missing env preventing the whole page from loading.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'https://orcnkyuwwkfdgvktunkd.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+if (!import.meta.env.VITE_SUPABASE_URL) {
+  // Log once to help debugging when envs are not loaded at build/dev time
+  // This is informational only — SUPABASE_URL fallback is safe but you should
+  // set VITE_SUPABASE_URL in your .env for clarity and multiple environments.
+  console.warn('VITE_SUPABASE_URL is not set — using fallback Supabase URL. Set VITE_SUPABASE_URL in your .env');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
