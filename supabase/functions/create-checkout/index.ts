@@ -3,8 +3,7 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:8080",
+  "https://aihub-jet.vercel.app",
 ];
 
 const getCorsHeaders = (origin: string | null) => {
